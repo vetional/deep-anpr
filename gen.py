@@ -157,11 +157,11 @@ def make_affine_transform(from_shape, to_shape,
 
 
 def generate_code():
-    return "{}{}{}{} {}{}{}".format(
+    return "{}{}{}{}{}{}{}".format(
         random.choice(common.LETTERS),
         random.choice(common.LETTERS),
-        random.choice(common.DIGITS),
-        random.choice(common.DIGITS),
+        random.choice(common.LETTERS),
+        random.choice(common.LETTERS),
         random.choice(common.LETTERS),
         random.choice(common.LETTERS),
         random.choice(common.LETTERS))
@@ -216,7 +216,8 @@ def generate_plate(font_height, char_ims):
 def generate_bg(num_bg_images):
     found = False
     while not found:
-        fname = "bgs/{:08d}.jpg".format(random.randint(0, num_bg_images - 1))
+        # fname = "bgs/{:08d}.jpg".format(random.randint(0, num_bg_images - 1))
+        fname = "bgs.jpeg"
         bg = cv2.imread(fname, cv2.CV_LOAD_IMAGE_GRAYSCALE) / 255.
         if (bg.shape[1] >= OUTPUT_SHAPE[1] and
             bg.shape[0] >= OUTPUT_SHAPE[0]):
@@ -268,7 +269,8 @@ def generate_ims(num_images):
     """
     variation = 1.0
     char_ims = dict(make_char_ims(FONT_HEIGHT))
-    num_bg_images = len(os.listdir("bgs"))
+    # num_bg_images = len(os.listdir("bgs"))
+    num_bg_images = 1
     for i in range(num_images):
         yield generate_im(char_ims, num_bg_images)
 
