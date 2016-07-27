@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright (c) 2016 Matthew Earl
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -35,9 +36,10 @@ import numpy
 
 
 DIGITS = "0123456789"
-LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-CHARS = LETTERS + DIGITS
-
+# LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+LETTERS = u'कहगसर'
+# CHARS = LETTERS + DIGITS
+CHARS = LETTERS
 def softmax(a):
     exps = numpy.exp(a.astype(numpy.float64))
     return exps / numpy.sum(exps, axis=-1)[:, numpy.newaxis]

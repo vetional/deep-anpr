@@ -47,7 +47,8 @@ from PIL import ImageFont
 
 import common
 
-FONT_PATH = "UKNumberPlate.ttf"
+# FONT_PATH = "UKNumberPlate.ttf"
+FONT_PATH = "Himalli.ttf"
 FONT_HEIGHT = 32  # Pixel size to which the chars are resized
 
 OUTPUT_SHAPE = (64, 128)
@@ -70,6 +71,7 @@ def make_char_ims(output_height):
         draw.text((0, 0), c, (255, 255, 255), font=font)
         scale = float(output_height) / height
         im = im.resize((int(width * scale), output_height), Image.ANTIALIAS)
+        im.save((c + '.png').encode('utf-8'))
         yield c, numpy.array(im)[:, :, 0].astype(numpy.float32) / 255.
 
 
@@ -157,7 +159,11 @@ def make_affine_transform(from_shape, to_shape,
 
 
 def generate_code():
-    return "{}{}{}{}{}{}{}".format(
+    return u"{}{}{}{} {}{}{}{} {}{} {}".format(
+        random.choice(common.LETTERS),
+        random.choice(common.LETTERS),
+        random.choice(common.LETTERS),
+        random.choice(common.LETTERS),
         random.choice(common.LETTERS),
         random.choice(common.LETTERS),
         random.choice(common.LETTERS),
@@ -201,6 +207,7 @@ def generate_plate(font_height, char_ims):
     
     x = h_padding
     y = v_padding 
+    print code
     for c in code:
         char_im = char_ims[c]
         ix, iy = int(x), int(y)
@@ -240,9 +247,9 @@ def generate_im(char_ims, num_bg_images):
                             to_shape=bg.shape,
                             min_scale=0.6,
                             max_scale=0.875,
-                            rotation_variation=1.0,
+                            rotation_variation=0.5,
                             scale_variation=1.5,
-                            translation_variation=1.2)
+                            translation_variation=0.5)
     plate = cv2.warpAffine(plate, M, (bg.shape[1], bg.shape[0]))
     plate_mask = cv2.warpAffine(plate_mask, M, (bg.shape[1], bg.shape[0]))
 
@@ -279,8 +286,8 @@ if __name__ == "__main__":
     os.mkdir("test")
     im_gen = generate_ims(int(sys.argv[1]))
     for img_idx, (im, c, p) in enumerate(im_gen):
-        fname = "test/{:08d}_{}_{}.png".format(img_idx, c,
+        fname = u"test/{:08d}_{}_{}.png".format(img_idx, c,
                                                "1" if p else "0")
         print fname
-        cv2.imwrite(fname, im * 255.)
+        cv2.imwrite(fname.encode('utf-8'), im * 255.)
 
