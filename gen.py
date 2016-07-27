@@ -47,30 +47,32 @@ from PIL import ImageFont
 
 import common
 
-# FONT_PATH = "UKNumberPlate.ttf"
-FONT_PATH = "Himalli.ttf"
-FONT_HEIGHT = 32  # Pixel size to which the chars are resized
+# FONT_PATH = "UKNumberPlate.ttf"F
+FONT_PATH = "NotoSansDevanagari-Regular.ttf"
+#FONT_PATH = "shusha.ttf"
+FONT_HEIGHT =16  #64 Pixel size to which the chars are resized
 
-OUTPUT_SHAPE = (64, 128)
+OUTPUT_SHAPE = (64, 128) #(256, 512)
 
 CHARS = common.CHARS + " "
-
+#unicode(txt,'UTF-8')
 
 def make_char_ims(output_height):
     font_size = output_height * 4
 
     font = ImageFont.truetype(FONT_PATH, font_size)
 
-    height = max(font.getsize(c)[1] for c in CHARS)
+    height = max(font.getsize(c)[1]*2 for c in CHARS)
 
     for c in CHARS:
         width = font.getsize(c)[0]
         im = Image.new("RGBA", (width, height), (0, 0, 0))
-
         draw = ImageDraw.Draw(im)
         draw.text((0, 0), c, (255, 255, 255), font=font)
+        print output_height," ", height," ",width
         scale = float(output_height) / height
         im = im.resize((int(width * scale), output_height), Image.ANTIALIAS)
+        #im.save((c + '.png')
         im.save((c + '.png').encode('utf-8'))
         yield c, numpy.array(im)[:, :, 0].astype(numpy.float32) / 255.
 
@@ -108,7 +110,7 @@ def pick_colors():
     return text_color, plate_color
 
 
-def make_affine_transform(from_shape, to_shape, 
+def make_affine_transform(from_shape, to_shape,
                           min_scale, max_scale,
                           scale_variation=1.0,
                           rotation_variation=1.0,
@@ -202,11 +204,11 @@ def generate_plate(font_height, char_ims):
                  int(text_width + h_padding * 2))
 
     text_color, plate_color = pick_colors()
-    
+
     text_mask = numpy.zeros(out_shape)
-    
+
     x = h_padding
-    y = v_padding 
+    y = v_padding
     print code
     for c in code:
         char_im = char_ims[c]
@@ -241,7 +243,7 @@ def generate_im(char_ims, num_bg_images):
     bg = generate_bg(num_bg_images)
 
     plate, plate_mask, code = generate_plate(FONT_HEIGHT, char_ims)
-    
+
     M, out_of_bounds = make_affine_transform(
                             from_shape=plate.shape,
                             to_shape=bg.shape,
